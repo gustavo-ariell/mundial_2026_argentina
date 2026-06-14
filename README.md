@@ -372,6 +372,80 @@ SELECT ranking_goleador,
  ORDER BY ranking_goleador, fecha;
 
 ```
+### 18. Informe completo de rendimiento ofensivo con ranking acumulado 
+(VERSION PARA MYSQL 8.0)
+
+```bash
+WITH rendimiento AS (
+    SELECT fp.id_futbolista,
+           fp.id_partido,
+           fp.goles,
+           fp.asistencias,
+           fp.minutos_jugados,
+           fp.titular,
+           p.fecha,
+           CONCAT('vs ', p.rival) AS rival
+      FROM futbolista_partido fp
+      JOIN partidos p ON fp.id_partido = p.id_partido
+),
+totales_jugador AS (
+    SELECT r.id_futbolista,
+           r.id_partido,
+           r.fecha,
+           r.rival,
+           r.goles,
+           r.asistencias,
+           r.minutos_jugados,
+           r.titular,
+           SUM(r.goles)       OVER (PARTITION BY r.id_futbolista ORDER BY r.fecha) AS goles_acum,
+           SUM(r.asistencias) OVER (PARTITION BY r.id_futbolista ORDER BY r.fecha) AS asist_acum,
+           SUM(r.goles)       OVER (PARTITION BY r.id_futbolista)                 AS total_goles_jugador
+      FROM rendimiento r
+),
+ranking AS (
+    SELECT RANK() OVER (ORDER BY tj.total_goles_jugador DESC) AS ranking_goleador,
+           f.dorsal,
+           f.nombre,
+           f.posicion,
+           f.ciudad_origen,
+           f.club,
+           ct.nombre AS tecnico,
+           tj.fecha,
+           tj.rival,
+           tj.goles,
+           tj.asistencias,
+           tj.minutos_jugados,
+           tj.titular,
+           tj.goles_acum,
+           tj.asist_acum
+      FROM totales_jugador tj
+      JOIN futbolistas f     ON tj.id_futbolista = f.id_futbolista
+      JOIN cuerpo_tecnico ct ON f.id_tecnico     = ct.id_tecnico
+)
+SELECT ranking_goleador,
+       dorsal,
+       nombre,
+       posicion,
+       ciudad_origen,
+       club,
+       tecnico,
+       fecha,
+       rival,
+       goles,
+       asistencias,
+       minutos_jugados,
+       CASE titular WHEN 1 THEN 'Si' ELSE 'No' END AS titular,
+       goles_acum,
+       asist_acum
+  FROM ranking
+ WHERE goles > 0 OR asistencias > 0
+ ORDER BY ranking_goleador, fecha;
+
+
+
+```
+
+
 ### 19. Comparativa de rendimiento por linea de juego
 
 ```bash
