@@ -5,6 +5,15 @@
 > Ordenadas de menor a mayor complejidad.
 
 ---
+| Nivel | Técnicas SQL                              | Consultas  |
+|:-----:|-------------------------------------------|:----------:|
+|   1   | `SELECT`, `WHERE`, `ORDER BY`, `LIKE`     |  1, 2, 3   |
+|   2   | `GROUP BY`, `COUNT`, `SUM`, `JOIN`        |  4, 5, 6   |
+|   3   | `JOIN` múltiple, `LEFT JOIN`              |  7, 8      |
+|   4   | Subconsultas (`IN`, escalar, correlac.)   |  9, 10, 11 |
+|   5   | `HAVING`, `SUBSTRING_INDEX`               | 12, 13, 14 |
+|   6   | Window functions (`RANK`, `OVER`), CTE    | 15, 16, 17 |
+|   7   | CTE múltiple + Window + `GROUP_CONCAT`    | 18, 19, 20 |
 
 ## Nivel 1 — Consultas simples (SELECT, WHERE, ORDER BY)
 
